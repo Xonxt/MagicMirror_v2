@@ -407,6 +407,35 @@ void CBodyBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 			}
 		}
 	}
+    
+    // check that there are no untracked ERROR bodies, remove them if there are
+    for (auto it2 = kinectBodies.begin(); it2 != kinectBodies.end();)
+    {
+      bool found = false;
+      for (int i = 0; i < nBodyCount; ++i)
+      {
+          IBody* pBody = ppBodies[i];
+          if (pBody)
+          {
+              UINT64 trackingId;
+              hr = pBody->get_TrackingId(&trackingId);
+
+              if (it2->first == trackingId) {
+                  found = true;
+                  break;
+              }
+          }
+      }
+
+      if ( !found )
+      {
+          it2 = kinectBodies.erase(it2);
+      }
+      else
+      {
+          ++it2;
+      }
+    }
 
 	for (auto& it : kinectBodies) {
 		DrawSkeleton(it.second);
